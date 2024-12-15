@@ -18,8 +18,8 @@ export default defineConfig({
       },
     },
   },
-  // Add base URL configuration for static hosting
-  base: '/',
+  // Update base URL to use /fulfill subdirectory
+  base: '/fulfill/',
   // Development server configuration
   server: {
     port: 3009,
