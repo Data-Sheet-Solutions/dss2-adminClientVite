@@ -1,10 +1,10 @@
-@import url("https://unpkg.com/tailwindcss@^1.0/dist/tailwind.min.css");
+@import url('https://unpkg.com/tailwindcss@^1.0/dist/tailwind.min.css');
 
 body {
   background-color: #4286f4;
 }
 #root {
-  max-width: 1280px;
+  width: 100% !important;
   margin: 0 auto;
   padding: 2rem;
   text-align: center;
@@ -46,7 +46,6 @@ body {
   padding: 2em;
 }
 
-
 .btn-doc {
-  color: black
+  color: black;
 }
