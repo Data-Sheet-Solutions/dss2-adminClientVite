@@ -1,9 +1,10 @@
-import { Navigate } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 import { useKeycloak } from '@react-keycloak/web';
 
 const PrivateRoute = ({ children }) => {
   console.log('[PrivateRoute] Rendering');
   const { keycloak } = useKeycloak();
+  const location = useLocation();
 
   console.log('[PrivateRoute] Authentication state:', {
     authenticated: keycloak?.authenticated,
@@ -32,8 +33,8 @@ const PrivateRoute = ({ children }) => {
 
   const authorized = isAuthorized();
   if (!authorized) {
-    console.log('[PrivateRoute] Not authorized');
-    return <div>You are not authorized to access this page.</div>;
+    console.log('[PrivateRoute] Not authorized, redirecting to login with message');
+    return <Navigate to="/" state={{ unauthorized: true }} replace />;
   }
 
   console.log('[PrivateRoute] Authorized, rendering children');

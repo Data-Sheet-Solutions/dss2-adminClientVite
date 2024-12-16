@@ -2,9 +2,9 @@ import Keycloak from 'keycloak-js';
 
 console.log('[Keycloak] Creating configuration');
 const keycloakConfig = {
-  url: 'https://sds.zone/auth/',
-  realm: 'dss-realm',
-  clientId: 'portal-app',
+  url: import.meta.env.VITE_KEYCLOAK_URL,
+  realm: import.meta.env.VITE_KEYCLOAK_REALM,
+  clientId: import.meta.env.VITE_KEYCLOAK_CLIENT_ID,
 };
 
 console.log('[Keycloak] Initializing Keycloak instance');

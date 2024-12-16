@@ -1,6 +1,6 @@
-import { Button } from 'react-bootstrap';
+import { Button, Alert } from 'react-bootstrap';
 import { useEffect, useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import { ReactKeycloakProvider, useKeycloak } from '@react-keycloak/web';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './index.css';
@@ -13,17 +13,25 @@ function LoginScreen() {
   console.log('[LoginScreen] Rendering');
   const { keycloak } = useKeycloak();
   const navigate = useNavigate();
+  const location = useLocation();
+  const showUnauthorized = location.state?.unauthorized;
 
   useEffect(() => {
-    if (keycloak?.authenticated) {
-      console.log('[LoginScreen] User is authenticated, navigating to /home');
+    if (keycloak?.authenticated && !showUnauthorized) {
+      console.log('[LoginScreen] User is authenticated and authorized, navigating to /home');
       navigate('/home');
     }
-  }, [keycloak?.authenticated, navigate]);
+  }, [keycloak?.authenticated, navigate, showUnauthorized]);
 
   const handleLogin = () => {
     console.log('[LoginScreen] Login button clicked');
     keycloak.login();
+  };
+
+  const handleLogout = () => {
+    console.log('[LoginScreen] Logout clicked');
+    const redirectUri = new URL('/fulfill/', window.location.origin).toString();
+    keycloak.logout({ redirectUri });
   };
 
   return (
@@ -43,10 +51,21 @@ function LoginScreen() {
       className="d-flex justify-content-center align-items-center"
     >
       <div className="d-flex flex-column align-items-center">
+        {showUnauthorized && (
+          <Alert variant="danger" className="mb-4">
+            You are not authorized to access this application. Please contact your administrator.
+          </Alert>
+        )}
         <img src={logo} alt="DSS Logo" style={{ width: '300px', marginBottom: '2rem' }} />
-        <Button variant="primary" size="lg" onClick={handleLogin}>
-          Log In
-        </Button>
+        {keycloak?.authenticated ? (
+          <Button variant="danger" size="lg" onClick={handleLogout}>
+            Logout
+          </Button>
+        ) : (
+          <Button variant="primary" size="lg" onClick={handleLogin}>
+            Log In
+          </Button>
+        )}
       </div>
     </div>
   );
@@ -104,23 +123,23 @@ function App() {
       onTokens={onKeycloakTokens}
       LoadingComponent={<div>Loading Keycloak...</div>}
     >
-      {keycloakReady
-        ? console.log('[App] Rendering Router') || (
-            <Router basename="/fulfill">
-              <Routes>
-                <Route path="/" element={<LoginScreen />} />
-                <Route
-                  path="/home"
-                  element={
-                    <PrivateRoute>
-                      <Home />
-                    </PrivateRoute>
-                  }
-                />
-              </Routes>
-            </Router>
-          )
-        : console.log('[App] Showing loading state') || <div>Loading Keycloak...</div>}
+      {keycloakReady ? (
+        <Router basename="/fulfill/">
+          <Routes>
+            <Route path="/" element={<LoginScreen />} />
+            <Route
+              path="/home"
+              element={
+                <PrivateRoute>
+                  <Home />
+                </PrivateRoute>
+              }
+            />
+          </Routes>
+        </Router>
+      ) : (
+        console.log('[App] Showing loading state') || <div>Loading Keycloak...</div>
+      )}
     </ReactKeycloakProvider>
   );
 }
