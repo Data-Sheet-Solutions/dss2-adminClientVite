@@ -1,7 +1,50 @@
 import React from 'react';
 import { Pagination, DropdownButton, Dropdown } from 'react-bootstrap';
 
-const PaginationComponent = ({ currentPage, totalPages, onPageChange, previousPage, nextPage, pageSize, totalEntries, onPageSizeChange }) => {
+const PaginationComponent = ({
+  currentPage,
+  totalPages,
+  onPageChange,
+  previousPage,
+  nextPage,
+  pageSize,
+  totalEntries,
+  onPageSizeChange,
+  isServerSide = false,
+  table = null,
+}) => {
+  const handlePageSizeChange = (newSize) => {
+    if (isServerSide) {
+      onPageSizeChange(newSize);
+    } else {
+      table.setPageSize(newSize);
+    }
+  };
+
+  const handlePreviousPage = () => {
+    if (isServerSide) {
+      previousPage();
+    } else {
+      table.previousPage();
+    }
+  };
+
+  const handleNextPage = () => {
+    if (isServerSide) {
+      nextPage();
+    } else {
+      table.nextPage();
+    }
+  };
+
+  const handlePageChange = (page) => {
+    if (isServerSide) {
+      onPageChange(page);
+    } else {
+      table.setPageIndex(page);
+    }
+  };
+
   const getPaginationButtons = (currentPage, totalPages) => {
     const buttons = [];
     const maxButtons = 7;
@@ -41,19 +84,25 @@ const PaginationComponent = ({ currentPage, totalPages, onPageChange, previousPa
     return buttons;
   };
 
-  const paginationButtons = getPaginationButtons(currentPage, totalPages);
-  const startEntry = (currentPage - 1) * pageSize + 1;
-  const endEntry = Math.min(currentPage * pageSize, totalEntries);
+  // Use table state for client-side pagination if available
+  const currentPageValue = isServerSide ? currentPage : table?.getState().pagination.pageIndex + 1;
+  const pageSizeValue = isServerSide ? pageSize : table?.getState().pagination.pageSize;
+  const totalPagesValue = isServerSide ? totalPages : table ? Math.ceil(table.getFilteredRowModel().rows.length / pageSizeValue) : 1;
+  const totalEntriesValue = isServerSide ? totalEntries : table?.getFilteredRowModel().rows.length || 0;
+
+  const paginationButtons = getPaginationButtons(currentPageValue, totalPagesValue);
+  const startEntry = (currentPageValue - 1) * pageSizeValue + 1;
+  const endEntry = Math.min(currentPageValue * pageSizeValue, totalEntriesValue);
 
   return (
     <div className="d-flex justify-content-between align-items-center p-3 bg-white border-top">
       <div className="d-flex align-items-center">
         <span>
-          Showing {startEntry} to {endEntry} of {totalEntries} entries
+          Showing {startEntry} to {endEntry} of {totalEntriesValue} entries
         </span>
-        <DropdownButton title={`${pageSize} per page`} variant="outline-secondary" size="sm" className="ms-2">
+        <DropdownButton title={`${pageSizeValue} per page`} variant="outline-secondary" size="sm" className="ms-2">
           {[10, 20, 50, 100].map((size) => (
-            <Dropdown.Item key={size} onClick={() => onPageSizeChange(size)} active={pageSize === size}>
+            <Dropdown.Item key={size} onClick={() => handlePageSizeChange(size)} active={pageSizeValue === size}>
               {size} per page
             </Dropdown.Item>
           ))}
@@ -63,16 +112,16 @@ const PaginationComponent = ({ currentPage, totalPages, onPageChange, previousPa
       <Pagination className="mb-0">
         {paginationButtons.map((button, index) => {
           if (button.type === 'prev') {
-            return <Pagination.Prev key={index} onClick={previousPage} disabled={button.disabled} />;
+            return <Pagination.Prev key={index} onClick={handlePreviousPage} disabled={button.disabled} />;
           }
           if (button.type === 'next') {
-            return <Pagination.Next key={index} onClick={nextPage} disabled={button.disabled} />;
+            return <Pagination.Next key={index} onClick={handleNextPage} disabled={button.disabled} />;
           }
           if (button.type === 'ellipsis') {
             return <Pagination.Ellipsis key={index} disabled />;
           }
           return (
-            <Pagination.Item key={index} active={button.active} onClick={() => onPageChange(button.page - 1)}>
+            <Pagination.Item key={index} active={button.active} onClick={() => handlePageChange(button.page - 1)}>
               {button.page}
             </Pagination.Item>
           );

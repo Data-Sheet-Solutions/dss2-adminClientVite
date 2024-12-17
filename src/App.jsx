@@ -128,7 +128,7 @@ function App() {
           <Routes>
             <Route path="/" element={<LoginScreen />} />
             <Route
-              path="/home"
+              path="/home/*"
               element={
                 <PrivateRoute>
                   <Home />

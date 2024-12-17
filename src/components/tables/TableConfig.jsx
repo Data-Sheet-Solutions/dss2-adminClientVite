@@ -4,7 +4,33 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch, faXmark } from '@fortawesome/pro-solid-svg-icons';
 import ColumnVisibilityToggle from './ColumnVisibilityToggle';
 
-const TableConfig = ({ table, globalFilter, setGlobalFilter, columnVisibility, onColumnVisibilityChange, title, totalCount }) => {
+const TableConfig = ({
+  table,
+  globalFilter,
+  setGlobalFilter,
+  columnVisibility,
+  onColumnVisibilityChange,
+  title,
+  totalCount,
+  isServerSide = false,
+}) => {
+  const handleSearchChange = (e) => {
+    const value = e.target.value;
+    if (isServerSide) {
+      setGlobalFilter(value);
+    } else {
+      table.setGlobalFilter(value);
+    }
+  };
+
+  const handleClearSearch = () => {
+    if (isServerSide) {
+      setGlobalFilter('');
+    } else {
+      table.setGlobalFilter('');
+    }
+  };
+
   return (
     <div className="d-flex justify-content-between align-items-center mb-3">
       <h5>
@@ -18,11 +44,11 @@ const TableConfig = ({ table, globalFilter, setGlobalFilter, columnVisibility, o
           <Form.Control
             type="text"
             placeholder="Search records..."
-            value={globalFilter || ''}
-            onChange={(e) => setGlobalFilter(e.target.value)}
+            value={isServerSide ? globalFilter : table.getState().globalFilter ?? ''}
+            onChange={handleSearchChange}
             style={{ paddingRight: '30px' }}
           />
-          {globalFilter && (
+          {(isServerSide ? globalFilter : table.getState().globalFilter) && (
             <div
               style={{
                 position: 'absolute',
@@ -32,7 +58,7 @@ const TableConfig = ({ table, globalFilter, setGlobalFilter, columnVisibility, o
                 zIndex: 10,
                 cursor: 'pointer',
               }}
-              onClick={() => setGlobalFilter('')}
+              onClick={handleClearSearch}
             >
               <FontAwesomeIcon icon={faXmark} className="text-danger" />
             </div>
