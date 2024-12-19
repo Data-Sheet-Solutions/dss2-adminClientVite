@@ -6,6 +6,15 @@ export const useGet = () => {
 
   const getData = useCallback(
     async (path, params = {}, options = {}) => {
+      // For binary data, set appropriate headers
+      if (options.responseType === 'arraybuffer') {
+        options.headers = {
+          ...options.headers,
+          Accept: 'application/pdf',
+          'Content-Type': 'application/pdf',
+        };
+      }
+
       return sendRequest(path, params, options);
     },
     [sendRequest]

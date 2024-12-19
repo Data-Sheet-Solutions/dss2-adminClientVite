@@ -1,5 +1,6 @@
 import React from 'react';
 import FilterableCell from './FilterableCell';
+import Actions from './Actions';
 
 export const getNeedsReviewColumnDefinitions = (setGlobalFilter) => {
   if (!setGlobalFilter) {
@@ -7,6 +8,14 @@ export const getNeedsReviewColumnDefinitions = (setGlobalFilter) => {
   }
 
   return [
+    {
+      id: 'actions',
+      header: 'Actions',
+      cell: ({ row }) => <Actions row={row.original} />,
+      enableSorting: false,
+      enableFiltering: false,
+      defaultVisible: true,
+    },
     {
       id: 'productIdentifier',
       header: 'Product',
@@ -17,8 +26,8 @@ export const getNeedsReviewColumnDefinitions = (setGlobalFilter) => {
     },
     {
       id: 'manufacturerName',
-      header: 'Man Name',
-      accessorKey: 'manufacturerName',
+      header: 'Manufacturer',
+      accessorKey: 'manName',
       enableSorting: true,
       enableFiltering: true,
       defaultVisible: true,

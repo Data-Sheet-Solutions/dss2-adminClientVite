@@ -1,0 +1,20 @@
+// Suppress deprecation warnings
+$enable-deprecation-messages: false !important;
+$enable-important-utilities: true;
+$sass-deprecate-mixed-decls: false !important;
+
+// Import Bootstrap functions first
+@import 'bootstrap/scss/functions';
+
+// Custom variables
+$primary: #007bff;
+$secondary: #6c757d;
+$success: #28a745;
+$info: #17a2b8;
+$warning: #ffc107;
+$danger: #dc3545;
+$light: #f8f9fa;
+$dark: #343a40;
+
+// Import all of Bootstrap
+@import 'bootstrap/scss/bootstrap';

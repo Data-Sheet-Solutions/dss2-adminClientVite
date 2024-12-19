@@ -3,10 +3,11 @@
   "version": "1.0.2",
   "type": "module",
   "scripts": {
-    "build": "vite build",
+    "copy-pdf-worker": "node copy-pdf-worker.js",
+    "build": "node copy-pdf-worker.js && vite build",
     "start": "node sammy.js; serve -s _static -l tcp://0.0.0.0:$PORT -n",
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
-    "dev": "vite",
+    "dev": "node copy-pdf-worker.js && vite",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -21,6 +22,7 @@
     "bootstrap": "^5.3.3",
     "js-cookie": "^3.0.5",
     "keycloak-js": "^26.0.7",
+    "pdfjs-dist": "^4.9.155",
     "react": "^18.2.0",
     "react-bootstrap": "^2.10.7",
     "react-dom": "^18.2.0",
@@ -35,6 +37,7 @@
     "eslint-plugin-react": "^7.32.2",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.3",
+    "sass": "^1.71.1",
     "vite": "^4.4.11"
   }
 }

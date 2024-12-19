@@ -6,6 +6,7 @@ import TableConfig from './TableConfig';
 import TableHeader from './TableHeader';
 import PaginationComponent from './Pagination';
 import FilterableCell from './FilterableCell';
+import Actions from './Actions';
 import Cookies from 'js-cookie';
 
 // Column definitions for all tables
@@ -65,7 +66,7 @@ const getColumns = (lastSelectedIndex, setLastSelectedIndex, setGlobalFilter) =>
   {
     id: 'productIdentifier',
     header: 'Product ID',
-    accessorFn: (row) => row.canonicalProperties?.productIdentifier,
+    accessorKey: 'productIdentifier',
     enableSorting: true,
     enableFiltering: true,
     defaultVisible: true,
@@ -73,7 +74,7 @@ const getColumns = (lastSelectedIndex, setLastSelectedIndex, setGlobalFilter) =>
   {
     id: 'manName',
     header: 'Manufacturer',
-    accessorFn: (row) => row.canonicalProperties?.manName,
+    accessorKey: 'manName',
     enableSorting: true,
     enableFiltering: true,
     defaultVisible: true,
@@ -82,7 +83,7 @@ const getColumns = (lastSelectedIndex, setLastSelectedIndex, setGlobalFilter) =>
   {
     id: 'aka',
     header: 'AKA',
-    accessorFn: (row) => row.canonicalProperties?.aka,
+    accessorKey: 'aka',
     enableSorting: true,
     enableFiltering: true,
     defaultVisible: false,
@@ -90,7 +91,7 @@ const getColumns = (lastSelectedIndex, setLastSelectedIndex, setGlobalFilter) =>
   {
     id: 'upc',
     header: 'UPC',
-    accessorFn: (row) => row.canonicalProperties?.upc,
+    accessorKey: 'upc',
     enableSorting: true,
     enableFiltering: true,
     defaultVisible: false,
@@ -98,7 +99,7 @@ const getColumns = (lastSelectedIndex, setLastSelectedIndex, setGlobalFilter) =>
   {
     id: 'clientName',
     header: 'Client',
-    accessorFn: (row) => row.client[0]?.clientName,
+    accessorKey: 'clientName',
     enableSorting: true,
     enableFiltering: true,
     defaultVisible: true,
@@ -111,6 +112,14 @@ const getColumns = (lastSelectedIndex, setLastSelectedIndex, setGlobalFilter) =>
     enableSorting: true,
     defaultVisible: true,
     cell: ({ getValue }) => new Date(getValue()).toLocaleDateString(),
+  },
+  {
+    id: 'actions',
+    header: 'Actions',
+    cell: ({ row }) => <Actions row={row.original} />,
+    enableSorting: false,
+    enableFiltering: false,
+    defaultVisible: true,
   },
 ];
 
@@ -167,7 +176,7 @@ const PendingTableContent = ({ data, isLoading, error, searchString, onUpdate })
 
   // Table instance
   const table = useReactTable({
-    data,
+    data: data,
     columns,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),

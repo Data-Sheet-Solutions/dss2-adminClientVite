@@ -2,10 +2,12 @@ import React from 'react';
 import { Navbar as BootstrapNavbar, Container, Nav, Button } from 'react-bootstrap';
 import { useKeycloak } from '@react-keycloak/web';
 import { useNavigate } from 'react-router-dom';
+import { useUser } from '../../context/UserContext';
 
 function Navbar() {
   const { keycloak } = useKeycloak();
   const navigate = useNavigate();
+  const { firstName, lastName } = useUser();
 
   const handleLogout = () => {
     keycloak.logout({ redirectUri: window.location.origin + '/fulfill/' });
@@ -20,7 +22,9 @@ function Navbar() {
           <Nav className="ms-auto">
             {keycloak?.authenticated && (
               <div className="d-flex align-items-center">
-                <span className="text-light me-3">{keycloak.tokenParsed?.preferred_username}</span>
+                <span className="text-light me-3">
+                  {firstName} {lastName}
+                </span>
                 <Button variant="outline-light" size="sm" onClick={handleLogout}>
                   Logout
                 </Button>

@@ -24,7 +24,7 @@ const WindowSwitcher = () => {
           P3
         </Button>
         <Button variant={isActive('/waiting') ? 'primary' : 'outline-primary'} onClick={() => navigate('/home/waiting')}>
-          In Process
+          Waiting
         </Button>
         <Button variant={isActive('/review') ? 'primary' : 'outline-primary'} onClick={() => navigate('/home/review')}>
           Needs Review

@@ -15,7 +15,7 @@ const useRequest = (method = 'get') => {
       headers: {
         'Content-Type': 'application/json',
         ...(token && { Authorization: `Bearer ${token}` }),
-        ...options.headers,
+        ...(options.headers || {}),
       },
       ...options,
     };
@@ -37,23 +37,32 @@ const useRequest = (method = 'get') => {
       setError(null);
 
       try {
-        if (keycloak?.authenticated) {
-          await keycloak.updateToken(30);
+        if (!keycloak?.authenticated) {
+          throw new Error('User not authenticated');
         }
 
-        const config = createRequestConfig(path, data, options, keycloak?.authenticated ? keycloak.token : null);
-
+        await keycloak.updateToken(30);
+        const config = createRequestConfig(path, data, options, keycloak.token);
         const result = await axios(config);
-        setResponse(result.data);
-        return result.data;
+
+        // Only update response state for non-binary data
+        if (!options.responseType || options.responseType !== 'arraybuffer') {
+          setResponse(result.data);
+        }
+
+        return options.responseType === 'arraybuffer' ? result : result.data;
       } catch (error) {
         if ((error.response?.status === 401 || error.response?.status === 403) && keycloak?.authenticated) {
           try {
             await keycloak.updateToken(30);
             const retryConfig = createRequestConfig(path, data, options, keycloak.token);
             const retryResult = await axios(retryConfig);
-            setResponse(retryResult.data);
-            return retryResult.data;
+
+            if (!options.responseType || options.responseType !== 'arraybuffer') {
+              setResponse(retryResult.data);
+            }
+
+            return options.responseType === 'arraybuffer' ? retryResult : retryResult.data;
           } catch (retryError) {
             keycloak.login();
             setError(retryError);
